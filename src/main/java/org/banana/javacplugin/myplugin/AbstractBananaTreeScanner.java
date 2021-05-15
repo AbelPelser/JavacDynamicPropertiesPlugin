@@ -1,11 +1,13 @@
 package org.banana.javacplugin.myplugin;
 
-import com.sun.source.tree.ClassTree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
-import com.sun.tools.javac.util.*;
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Log;
+import com.sun.tools.javac.util.Name;
+import com.sun.tools.javac.util.Names;
 import org.banana.javacplugin.builder.*;
 
 import java.lang.reflect.Field;
@@ -34,12 +36,11 @@ public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
     protected static final String GET = "get";
     protected static final String PUT = "put";
     protected static final String SET = "set";
-
+    protected static final int RANDOM_NR = Math.abs(new Random().nextInt());
+    protected static final String MONKEY_MAP = "__monkeyMap" + RANDOM_NR;
     protected final TreeMaker factory;
     protected final Names symbolsTable;
     protected final Log log;
-    protected static final int RANDOM_NR = Math.abs(new Random().nextInt());
-    protected static final String MONKEY_MAP = "__monkeyMap" + RANDOM_NR;
 
     public AbstractBananaTreeScanner(Context context) {
         factory = TreeMaker.instance(context);
@@ -95,10 +96,12 @@ public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
         return getImportBuilder().packageName(packageName).name(name).staticImport(staticImport).build();
     }
 
+    // import packageName.name;
     protected JCTree.JCImport createImport(String packageName, String name) {
         return createImport(packageName, name, false);
     }
 
+    // mapName.get(value)
     protected JCTree.JCMethodInvocation createMapGet(String mapName, String value) {
         return createMethodInvocation(mapName, GET, createIdent(value));
     }
@@ -107,6 +110,7 @@ public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
         return factory.Select(varName, createName(memberName));
     }
 
+    // varName.memberName
     protected JCTree.JCFieldAccess createMemberSelect(String varName, String memberName) {
         return createMemberSelect(createIdent(varName), memberName);
     }
@@ -115,10 +119,12 @@ public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
         return factory.Apply(null, method, javacList(args));
     }
 
+    // object.methodName(args)
     protected JCTree.JCMethodInvocation createMethodInvocation(String objectName, String methodName, JCTree.JCExpression... args) {
         return createMethodInvocation(createMemberSelect(objectName, methodName), args);
     }
 
+    // expression;
     protected JCTree.JCExpressionStatement exprToStmt(JCTree.JCExpression expression) {
         return factory.Exec(expression);
     }
@@ -130,6 +136,8 @@ public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
         );
     }
 
+    // varType<paramArgTypeNames>
+    // Example: Map<String, Object>
     protected JCTree.JCTypeApply createParametrizedType(String varTypeName, String... paramArgTypeNames) {
         JCTree.JCIdent[] paramArgs = Arrays.stream(paramArgTypeNames)
                 .map(this::createIdent)
