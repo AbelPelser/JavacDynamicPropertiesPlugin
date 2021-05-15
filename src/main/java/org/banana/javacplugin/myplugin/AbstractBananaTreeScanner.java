@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import java.util.Collections;
+
 import static org.banana.javacplugin.util.TreeMakerUtil.javacList;
 
 public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
@@ -24,6 +26,7 @@ public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
     protected static final String JAVA_UTIL = "java.util";
 
     protected static final String CLASS = Class.class.getSimpleName();
+    protected static final String COLLECTIONS = Collections.class.getSimpleName();
     protected static final String FIELD = Field.class.getSimpleName();
     protected static final String HASH_MAP = HashMap.class.getSimpleName();
     protected static final String ILLEGAL_STATE_EXCEPTION = IllegalStateException.class.getSimpleName();
@@ -36,6 +39,7 @@ public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
     protected static final String GET = "get";
     protected static final String PUT = "put";
     protected static final String SET = "set";
+    protected static final String SYNC_MAP = "synchronizedMap";
     protected static final int RANDOM_NR = Math.abs(new Random().nextInt());
     protected static final String MONKEY_MAP = "__monkeyMap" + RANDOM_NR;
     protected final TreeMaker factory;

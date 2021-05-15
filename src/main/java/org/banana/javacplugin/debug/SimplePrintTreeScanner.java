@@ -1,4 +1,4 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.debug;
 
 import com.sun.source.tree.*;
 import com.sun.source.util.TreeScanner;

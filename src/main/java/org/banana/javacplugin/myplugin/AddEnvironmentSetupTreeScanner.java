@@ -119,9 +119,14 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
                 .build();
     }
 
-    // monkeyMap = new HashMap<Object, Object>(oldMap);
+    // Collections.synchronizedMap(new HashMap<Object, Object>(oldMap))
+    private JCTree.JCMethodInvocation copyAndSyncOldEnvMap() {
+        return createMethodInvocation(COLLECTIONS, SYNC_MAP, copyOldEnvMap());
+    }
+
+    // monkeyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
     private JCTree.JCExpressionStatement cloneAndStoreEnvMap() {
-        return exprToStmt(factory.Assign(createIdent(MONKEY_MAP), copyOldEnvMap()));
+        return exprToStmt(factory.Assign(createIdent(MONKEY_MAP), copyAndSyncOldEnvMap()));
     }
 
     // unmodifiableMapField.set(null, monkeyMap);
@@ -143,7 +148,7 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
      *  Field modifiersField = Field.class.getDeclaredField("modifiers");
      *  modifiersField.setAccessible(true);
      *  modifiersField.setInt(unmodifiableMapField, unmodifiableMapField.getModifiers() & ~Modifier.FINAL);
-     *  monkeyMap = new HashMap<Object, Object>(oldMap);
+     *  monkeyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
      *  unmodifiableMapField.set(null, monkeyMap);
      */
     private List<JCTree.JCStatement> createSetupTryBlockStmts() {
@@ -191,7 +196,7 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
      *      Field modifiersField = Field.class.getDeclaredField("modifiers");
      *      modifiersField.setAccessible(true);
      *      modifiersField.setInt(unmodifiableMapField, unmodifiableMapField.getModifiers() & ~Modifier.FINAL);
-     *      monkeyMap = new HashMap<Object, Object>(oldMap);
+     *      monkeyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
      *      unmodifiableMapField.set(null, monkeyMap);
      *  } catch (Exception ignore) {
      *  }
@@ -219,7 +224,7 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
      *          Field modifiersField = Field.class.getDeclaredField("modifiers");
      *          modifiersField.setAccessible(true);
      *          modifiersField.setInt(unmodifiableMapField, unmodifiableMapField.getModifiers() & ~Modifier.FINAL);
-     *          monkeyMap = new HashMap<Object, Object>(oldMap);
+     *          monkeyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
      *          unmodifiableMapField.set(null, monkeyMap);
      *      } catch (Exception ignore) {
      *      }

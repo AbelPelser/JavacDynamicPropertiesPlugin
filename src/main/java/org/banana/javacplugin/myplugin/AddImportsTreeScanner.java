@@ -17,7 +17,8 @@ public class AddImportsTreeScanner extends AbstractBananaTreeScanner {
                 createImport(JAVA_LANG_REFLECT, FIELD),
                 createImport(JAVA_LANG_REFLECT, MODIFIER),
                 createImport(JAVA_UTIL, MAP),
-                createImport(JAVA_UTIL, HASH_MAP)
+                createImport(JAVA_UTIL, HASH_MAP),
+                createImport(JAVA_UTIL, COLLECTIONS)
         );
     }
 
