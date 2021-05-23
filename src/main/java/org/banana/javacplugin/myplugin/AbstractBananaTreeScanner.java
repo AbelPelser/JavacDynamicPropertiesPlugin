@@ -1,5 +1,6 @@
 package org.banana.javacplugin.myplugin;
 
+import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
@@ -12,16 +13,11 @@ import org.banana.javacplugin.builder.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
-import java.util.Collections;
+import static org.banana.javacplugin.util.ListUtil.javacList;
 
-import static org.banana.javacplugin.util.TreeMakerUtil.javacList;
-
-public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
+public class AbstractBananaTreeScanner extends TreePathScanner<Void, List<JCTree>> {
     protected static final String JAVA_LANG_REFLECT = "java.lang.reflect";
     protected static final String JAVA_UTIL = "java.util";
 
@@ -42,6 +38,8 @@ public class AbstractBananaTreeScanner extends TreeScanner<Void, Void> {
     protected static final String SYNC_MAP = "synchronizedMap";
     protected static final int RANDOM_NR = Math.abs(new Random().nextInt());
     protected static final String MONKEY_MAP = "__monkeyMap" + RANDOM_NR;
+    protected static final String GET_METHOD = "__getMonkeyPatchProperty" + RANDOM_NR;
+    protected static final String SET_METHOD = "__setMonkeyPatchProperty" + RANDOM_NR;
     protected final TreeMaker factory;
     protected final Names symbolsTable;
     protected final Log log;

@@ -5,7 +5,9 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
-import static org.banana.javacplugin.util.TreeMakerUtil.javacList;
+import java.util.Map;
+
+import static org.banana.javacplugin.util.ListUtil.javacList;
 
 public class AddImportsTreeScanner extends AbstractBananaTreeScanner {
     public AddImportsTreeScanner(Context context) {
@@ -23,12 +25,13 @@ public class AddImportsTreeScanner extends AbstractBananaTreeScanner {
     }
 
     @Override
-    public Void visitCompilationUnit(CompilationUnitTree compilationUnitTree, Void unused) {
+    public Void visitCompilationUnit(CompilationUnitTree compilationUnitTree, java.util.List<JCTree> unused) {
         if (compilationUnitTree instanceof JCTree.JCCompilationUnit) {
             JCTree.JCCompilationUnit jcCompilationUnit = (JCTree.JCCompilationUnit) compilationUnitTree;
             List<JCTree> defs = jcCompilationUnit.defs;
             List<JCTree> imports = getImports();
-            if (defs.isEmpty() || defs.head instanceof JCTree.JCImport) {
+            unused.addAll(imports);
+            if (defs.isEmpty() || defs.head instanceof JCTree.JCImport || defs.head instanceof JCTree.JCClassDecl) {
                 jcCompilationUnit.defs = defs.prependList(imports);
             } else {
                 jcCompilationUnit.defs = defs.tail.prependList(imports).prepend(defs.head);

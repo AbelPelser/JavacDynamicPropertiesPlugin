@@ -6,11 +6,9 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
-import static org.banana.javacplugin.util.TreeMakerUtil.javacList;
+import static org.banana.javacplugin.util.ListUtil.javacList;
 
 public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner {
-    private static final String GET_METHOD = "__getMonkeyPatchProperty" + RANDOM_NR;
-
     public AddMonkeyGetTreeScanner(Context context) {
         super(context);
     }
@@ -129,11 +127,13 @@ public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
     }
 
     @Override
-    public Void visitClass(ClassTree classTree, Void unused) {
+    public Void visitClass(ClassTree classTree, java.util.List<JCTree> unused) {
         if (classTree instanceof JCTree.JCClassDecl) {
             JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) classTree;
             factory.at(classDecl.pos);
-            classDecl.defs = classDecl.defs.prependList(javacList(createGetMethod()));
+            JCTree.JCMethodDecl getMethod = createGetMethod();
+            unused.add(getMethod);
+            classDecl.defs = classDecl.defs.prependList(javacList(getMethod));
         }
         return super.visitClass(classTree, unused);
     }

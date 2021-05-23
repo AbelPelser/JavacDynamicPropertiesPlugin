@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 
 import java.util.Arrays;
 
-import static org.banana.javacplugin.util.TreeMakerUtil.javacList;
+import static org.banana.javacplugin.util.ListUtil.javacList;
 
 @Data
 @Accessors(chain = true, fluent = true)

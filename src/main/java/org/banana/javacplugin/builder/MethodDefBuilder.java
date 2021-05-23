@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import static com.sun.tools.javac.code.TypeTag.VOID;
-import static org.banana.javacplugin.util.TreeMakerUtil.emptyJavacList;
+import static org.banana.javacplugin.util.ListUtil.emptyJavacList;
 
 @Setter
 @Accessors(chain = true, fluent = true)

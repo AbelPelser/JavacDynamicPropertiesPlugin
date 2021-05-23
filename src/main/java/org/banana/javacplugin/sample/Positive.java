@@ -1,4 +1,4 @@
-package org.banana.javacplugin;
+package org.banana.javacplugin.sample;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

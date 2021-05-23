@@ -6,7 +6,7 @@ import com.sun.tools.javac.util.Names;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import static org.banana.javacplugin.util.TreeMakerUtil.javacList;
+import static org.banana.javacplugin.util.ListUtil.javacList;
 
 @Setter
 @Accessors(chain = true, fluent = true)

@@ -2,7 +2,7 @@ package org.banana.javacplugin.util;
 
 import com.sun.tools.javac.util.List;
 
-public class TreeMakerUtil {
+public class ListUtil {
     public static <T> List<T> emptyJavacList() {
         return List.nil();
     }

@@ -8,7 +8,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
 import static com.sun.tools.javac.code.BoundKind.UNBOUND;
-import static org.banana.javacplugin.util.TreeMakerUtil.javacList;
+import static org.banana.javacplugin.util.ListUtil.javacList;
 
 public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
     private static final String GET_DECLARED_FIELD = "getDeclaredField";
@@ -260,7 +260,7 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
     }
 
     @Override
-    public Void visitClass(ClassTree classTree, Void unused) {
+    public Void visitClass(ClassTree classTree, java.util.List<JCTree> unused) {
         if (classTree instanceof JCTree.JCClassDecl) {
             JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) classTree;
             factory.at(classDecl.pos);
@@ -269,6 +269,7 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
                     createSetupMethodCall(),
                     createSetupMethod()
             );
+            unused.addAll(newMembers);
             classDecl.defs = classDecl.defs.prependList(newMembers);
         }
         return super.visitClass(classTree, unused);

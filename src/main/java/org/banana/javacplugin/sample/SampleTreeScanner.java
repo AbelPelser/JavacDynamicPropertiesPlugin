@@ -11,7 +11,6 @@ import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
-import org.banana.javacplugin.Positive;
 import org.banana.javacplugin.builder.NewClassBuilder;
 
 import java.util.Collections;
@@ -20,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.banana.javacplugin.util.TreeMakerUtil.javacList;
+import static org.banana.javacplugin.util.ListUtil.javacList;
 
 public class SampleTreeScanner extends TreeScanner<Void, Void> {
 

@@ -2,10 +2,12 @@ package org.banana.javacplugin;
 
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.Plugin;
-import com.sun.source.util.TaskListener;
 import com.sun.tools.javac.api.BasicJavacTask;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Log;
 import org.banana.javacplugin.myplugin.MyJavacTaskListener;
+
+import javax.lang.model.util.Elements;
 
 public class JavacPlugin implements Plugin {
 
@@ -18,8 +20,9 @@ public class JavacPlugin implements Plugin {
 
     @Override
     public void init(JavacTask task, String... args) {
-        Context context = ((BasicJavacTask) task).getContext();
-        TaskListener taskListener = new MyJavacTaskListener(context);
-        task.addTaskListener(taskListener);
+//        Trees trees = Trees.instance(task);
+        BasicJavacTask basicJavacTask = (BasicJavacTask) task;
+        Context context = basicJavacTask.getContext();
+        task.addTaskListener(new MyJavacTaskListener(context));
     }
 }

@@ -36,6 +36,7 @@ public class TestCompiler {
         StringWriter output = new StringWriter();
         CompilationTask task = getCompilerTask(fileManager, output, compilationUnits);
         task.call();
+        System.err.print(output);
         return fileManager.getCompiled().get(0).getCompiledBinaries();
     }
 }
