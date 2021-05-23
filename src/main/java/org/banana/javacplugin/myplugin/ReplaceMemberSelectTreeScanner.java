@@ -1,22 +1,21 @@
 package org.banana.javacplugin.myplugin;
 
+import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.comp.Enter;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Name;
 
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
-    private final Enter enter;
 
     public ReplaceMemberSelectTreeScanner(Context context) {
         super(context);
-        enter = Enter.instance(context);
     }
 
     private void printSym(Symbol sym) {
@@ -74,31 +73,54 @@ public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
         return (JCTree) getCurrentPath().getParentPath().getLeaf();
     }
 
-    private JCTree.JCTypeCast createReplacementNode(JCTree.JCFieldAccess fieldAccess) {
+    private JCTree.JCTypeCast createReplacementReadNode(JCTree.JCFieldAccess fieldAccess) {
         JCTree.JCExpression replacement = createMethodInvocation(createIdent(GET_METHOD), fieldAccess.selected, factory.Literal(fieldAccess.name.toString()));
         Type desiredType = getParentNode().type;
         if (desiredType == null) {
             throw new IllegalStateException("Could not determine required type!");
         }
-        JCTree.JCTypeCast replacementNode = factory.TypeCast(desiredType, replacement);
-//        replacementNode.accept(enter);
-        return replacementNode;
+        return factory.TypeCast(desiredType, replacement);
+    }
+
+    private void replaceFieldInParent(JCTree parent, Field parentField, JCTree originalNode, JCTree.JCTypeCast replacementNode) {
+        try {
+            if (parentField.get(parent) == originalNode) {
+                parentField.set(parent, replacementNode);
+            }
+        } catch (IllegalAccessException ignore) {
+            // Expected to happen, it's fine
+        }
+    }
+
+    private void replaceFieldsInParent(JCTree parent, JCTree originalNode, JCTree.JCTypeCast replacementNode) {
+        Arrays.stream(parent.getClass().getDeclaredFields())
+                .forEach(field -> replaceFieldInParent(parent, field, originalNode, replacementNode));
     }
 
     @Override
-    public Void visitMemberSelect(MemberSelectTree memberSelectTree, List<JCTree> unused) {
+    // Replace member select READs
+    public Void visitMemberSelect(MemberSelectTree memberSelectTree, Void unused) {
         JCTree.JCFieldAccess fieldAccess = (JCTree.JCFieldAccess) memberSelectTree;
 
         if (fieldAccess.type instanceof Type.ErrorType) {
             p("Found error in visitMemberSelect: " + memberSelectTree);
-            JCTree.JCTypeCast replacementNode = createReplacementNode(fieldAccess);
-            unused.add(replacementNode);
+            JCTree.JCTypeCast replacementNode = createReplacementReadNode(fieldAccess);
             p("Replacement node " + replacementNode);
-            ((JCTree.JCVariableDecl) getParentNode()).init = replacementNode;
+            replaceFieldsInParent(getParentNode(), fieldAccess, replacementNode);
             log.nerrors--;
         }
 //        dumpMemberSelect(fieldAccess);
 //        p("\n\n");
         return super.visitMemberSelect(memberSelectTree, unused);
+    }
+
+    @Override
+    // Replace member select WRITEs
+    public Void visitAssignment(AssignmentTree assignmentTree, Void unused) {
+        p("Found assignment " + assignmentTree);
+        // i.haha = 6;
+        // (int) __setMonkeyPatchProperty(i, "haha", 6);
+//        return super.visitAssignment(assignmentTree, unused);
+        return null;
     }
 }

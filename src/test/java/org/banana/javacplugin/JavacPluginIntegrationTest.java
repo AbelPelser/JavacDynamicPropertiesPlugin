@@ -10,7 +10,7 @@ public class JavacPluginIntegrationTest {
                     "\n" +
                     "public class " + CLASS_NAME +  " {\n" +
                     "    public static int test(String i) {\n" +
-//                    "        i.haha = 6;\n" +
+                    "        i.haha = 6;\n" +
                     "        int x = i.haha;\n" +
                     "        return x;\n" +
                     "    }\n" +

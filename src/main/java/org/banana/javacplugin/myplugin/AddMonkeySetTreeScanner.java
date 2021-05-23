@@ -101,12 +101,11 @@ public class AddMonkeySetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
     }
 
     @Override
-    public Void visitClass(ClassTree classTree, java.util.List<JCTree> unused) {
+    public Void visitClass(ClassTree classTree, Void unused) {
         if (classTree instanceof JCTree.JCClassDecl) {
             JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) classTree;
             factory.at(classDecl.pos);
             JCTree.JCMethodDecl setMethod = createSetMethod();
-            unused.add(setMethod);
             classDecl.defs = classDecl.defs.prependList(javacList(setMethod));
         }
         return super.visitClass(classTree, unused);

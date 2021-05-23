@@ -25,12 +25,11 @@ public class AddImportsTreeScanner extends AbstractBananaTreeScanner {
     }
 
     @Override
-    public Void visitCompilationUnit(CompilationUnitTree compilationUnitTree, java.util.List<JCTree> unused) {
+    public Void visitCompilationUnit(CompilationUnitTree compilationUnitTree, Void unused) {
         if (compilationUnitTree instanceof JCTree.JCCompilationUnit) {
             JCTree.JCCompilationUnit jcCompilationUnit = (JCTree.JCCompilationUnit) compilationUnitTree;
             List<JCTree> defs = jcCompilationUnit.defs;
             List<JCTree> imports = getImports();
-            unused.addAll(imports);
             if (defs.isEmpty() || defs.head instanceof JCTree.JCImport || defs.head instanceof JCTree.JCClassDecl) {
                 jcCompilationUnit.defs = defs.prependList(imports);
             } else {

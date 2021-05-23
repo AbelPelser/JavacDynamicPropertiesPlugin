@@ -260,7 +260,7 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
     }
 
     @Override
-    public Void visitClass(ClassTree classTree, java.util.List<JCTree> unused) {
+    public Void visitClass(ClassTree classTree, Void unused) {
         if (classTree instanceof JCTree.JCClassDecl) {
             JCTree.JCClassDecl classDecl = (JCTree.JCClassDecl) classTree;
             factory.at(classDecl.pos);
@@ -269,7 +269,6 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
                     createSetupMethodCall(),
                     createSetupMethod()
             );
-            unused.addAll(newMembers);
             classDecl.defs = classDecl.defs.prependList(newMembers);
         }
         return super.visitClass(classTree, unused);

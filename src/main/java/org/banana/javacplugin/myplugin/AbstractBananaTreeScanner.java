@@ -1,7 +1,6 @@
 package org.banana.javacplugin.myplugin;
 
 import com.sun.source.util.TreePathScanner;
-import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -17,7 +16,7 @@ import java.util.*;
 
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class AbstractBananaTreeScanner extends TreePathScanner<Void, List<JCTree>> {
+public class AbstractBananaTreeScanner extends TreePathScanner<Void, Void> {
     protected static final String JAVA_LANG_REFLECT = "java.lang.reflect";
     protected static final String JAVA_UTIL = "java.util";
 
