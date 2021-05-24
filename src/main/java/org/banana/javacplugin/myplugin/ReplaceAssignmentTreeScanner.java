@@ -20,8 +20,8 @@ import java.util.Optional;
 
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
-    public ReplaceMemberSelectTreeScanner(Context context) {
+public class ReplaceAssignmentTreeScanner extends AbstractBananaTreeScanner {
+    public ReplaceAssignmentTreeScanner(Context context) {
         super(context);
     }
 
@@ -35,14 +35,6 @@ public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
 
     private JCTree.JCLiteral convertNameToStringParam(Name name) {
         return factory.Literal(name.toString());
-    }
-
-    private JCTree.JCMethodInvocation createGetInvocation(JCTree.JCFieldAccess fieldAccess) {
-        return createMethodInvocation(
-                createIdent(GET_METHOD),
-                fieldAccess.selected,
-                convertNameToStringParam(fieldAccess.name)
-        );
     }
 
     private JCTree.JCExpression createCastIfPossible(JCTree.JCExpression expr, Type type) {
@@ -75,7 +67,6 @@ public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
         }
         return null;
     }
-
 
     // We are replacing an expression of a passed parameter, and need to cast appropriately
     private Type findTypeOfPassedParameter(JCTree.JCMethodInvocation parent, JCTree param) {
@@ -116,10 +107,6 @@ public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
         }
         p("Attempted to find varArgType in parameter list " + argTypes + " but couldn't");
         return null;
-    }
-
-    private JCTree.JCExpression createReplacementReadNode(JCTree.JCFieldAccess fieldAccess) {
-        return createCastIfPossible(createGetInvocation(fieldAccess), getCastTypeForNode(fieldAccess));
     }
 
     private boolean replaceFieldListInParent(JCTree parent, Field parentField, JCTree originalNode, JCTree.JCExpression replacementNode) throws IllegalAccessException {
@@ -190,22 +177,6 @@ public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
         }
         p("Calling visitMethodInvocation");
         return super.visitMethodInvocation((MethodInvocationTree) replacementNode, unused);
-    }
-
-    @Override
-    // Replace member select READs
-    public Void visitMemberSelect(MemberSelectTree memberSelectTree, Void unused) {
-        JCTree.JCFieldAccess fieldAccess = (JCTree.JCFieldAccess) memberSelectTree;
-
-        if (fieldAccess.type instanceof Type.ErrorType) {
-            p("\nFound error in visitMemberSelect: " + memberSelectTree + " (parent " + getParentNode() + ")");
-            JCTree.JCExpression replacementNode = createReplacementReadNode(fieldAccess);
-            p("Replacement node = " + replacementNode);
-            replacementCurrentNodeInParent(fieldAccess, replacementNode);
-            log.nerrors--;
-            return visitReplacementNode(replacementNode, unused);
-        }
-        return super.visitMemberSelect(memberSelectTree, unused);
     }
 
     private JCTree.JCMethodInvocation createSetInvocation(JCTree.JCFieldAccess fieldAccess, JCTree.JCExpression value) {

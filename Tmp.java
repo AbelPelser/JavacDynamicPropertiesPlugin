@@ -1,7 +1,7 @@
 package org.banana.javacplugin;
 
 public class Tmp {
-    private static int test(String i) {
+    /*private static int test(String i) {
         i.haha = 7;
         i.hihi = i.haha;
         int x = i.hihi;
@@ -12,9 +12,17 @@ public class Tmp {
 //        boolean b = Optional.of(i)
 //                .map(Tmp::testRef)
 //                .orElse(true);
-    }
+    }*/
+
 
     public static void main(String[] args) {
-        System.out.println("Hello world! " + test("sss"));
+//        System.out.println("Hello world! " + test("sss"));
+        X x = new X();
+//        x.y = 7;
+        System.out.println(x);
     }
+}
+
+class X {
+    private int y = 0;
 }

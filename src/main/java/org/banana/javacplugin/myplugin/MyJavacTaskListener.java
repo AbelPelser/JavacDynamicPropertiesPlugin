@@ -63,12 +63,16 @@ public class MyJavacTaskListener implements TaskListener {
         if (e.getKind() == TaskEvent.Kind.PARSE) {
             addMonkeyPatchCode(jcCompilationUnit);
             List<JCTree.JCCompilationUnit> results = javaCompiler.enterTrees(javacList(jcCompilationUnit));
-            attr.attrib(todo.remove());
+            log.printRawLines(results.size() + " results!");
+            log.printRawLines(todo.size() + " TODOs!");
+            while (!todo.isEmpty()) {
+                attr.attrib(todo.remove());
+            }
             JCTree.JCCompilationUnit result = results.stream()
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("No results obtained from enterTrees"));
             runTree(result, replaceMemberSelectTreeScanner);
-            runTree(result, simplePrintTreeScanner);
+//            runTree(result, simplePrintTreeScanner);
             chk.compiled.clear();
         }
     }

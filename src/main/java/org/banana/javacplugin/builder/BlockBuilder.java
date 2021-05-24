@@ -7,6 +7,9 @@ import com.sun.tools.javac.util.Names;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.io.IOException;
+import java.util.Map;
+
 import static org.banana.javacplugin.util.ListUtil.emptyJavacList;
 
 
@@ -24,4 +27,6 @@ public class BlockBuilder extends AbstractTreeBuilder<JCTree.JCBlock> {
     public JCTree.JCBlock build() {
         return factory.Block(flags, statements);
     }
+
+    private static Map map;
 }
