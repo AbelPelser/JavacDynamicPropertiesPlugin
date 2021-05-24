@@ -26,6 +26,7 @@ public class MyJavacTaskListener implements TaskListener {
     private final Check chk;
     private final JavaCompiler javaCompiler;
 
+    private final ReplaceAssignmentTreeScanner replaceAssignmentTreeScanner;
     private final ReplaceMemberSelectTreeScanner replaceMemberSelectTreeScanner;
     private final SimplePrintTreeScanner simplePrintTreeScanner;
 
@@ -36,6 +37,7 @@ public class MyJavacTaskListener implements TaskListener {
         todo = Todo.instance(context);
         chk = Check.instance(context);
         javaCompiler = JavaCompiler.instance(context);
+        replaceAssignmentTreeScanner = new ReplaceAssignmentTreeScanner(context);
         replaceMemberSelectTreeScanner = new ReplaceMemberSelectTreeScanner(context);
         simplePrintTreeScanner = new SimplePrintTreeScanner(context);
     }
@@ -71,6 +73,7 @@ public class MyJavacTaskListener implements TaskListener {
             JCTree.JCCompilationUnit result = results.stream()
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("No results obtained from enterTrees"));
+            runTree(result, replaceAssignmentTreeScanner);
             runTree(result, replaceMemberSelectTreeScanner);
 //            runTree(result, simplePrintTreeScanner);
             chk.compiled.clear();
