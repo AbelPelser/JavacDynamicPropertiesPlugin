@@ -9,6 +9,7 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import org.banana.javacplugin.builder.*;
+import org.banana.javacplugin.util.CustomTreePathScanner;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -16,7 +17,7 @@ import java.util.*;
 
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class AbstractBananaTreeScanner extends TreePathScanner<Void, Void> {
+public class AbstractBananaTreeScanner extends CustomTreePathScanner<Void, Void> {
     protected static final String JAVA_LANG_REFLECT = "java.lang.reflect";
     protected static final String JAVA_UTIL = "java.util";
 

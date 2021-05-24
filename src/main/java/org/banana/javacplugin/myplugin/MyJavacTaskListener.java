@@ -13,7 +13,6 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import org.banana.javacplugin.debug.SimplePrintTreeScanner;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.banana.javacplugin.util.ListUtil.javacList;
@@ -42,7 +41,6 @@ public class MyJavacTaskListener implements TaskListener {
     }
 
     private void runTree(CompilationUnitTree compilationUnit, TreeScanner<?, ?> treeScanner) {
-//        compilationUnit.accept(treeScanner, null);
         treeScanner.scan(compilationUnit, null);
     }
 
@@ -63,7 +61,6 @@ public class MyJavacTaskListener implements TaskListener {
         JCTree.JCCompilationUnit jcCompilationUnit = (JCTree.JCCompilationUnit) e.getCompilationUnit();
         log.printRawLines("FINISHED " + e.getKind());
         if (e.getKind() == TaskEvent.Kind.PARSE) {
-            log.printRawLines("PARSE finished, adding monkey patch code!");
             addMonkeyPatchCode(jcCompilationUnit);
             List<JCTree.JCCompilationUnit> results = javaCompiler.enterTrees(javacList(jcCompilationUnit));
             attr.attrib(todo.remove());
@@ -71,6 +68,7 @@ public class MyJavacTaskListener implements TaskListener {
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("No results obtained from enterTrees"));
             runTree(result, replaceMemberSelectTreeScanner);
+            runTree(result, simplePrintTreeScanner);
             chk.compiled.clear();
         }
     }
