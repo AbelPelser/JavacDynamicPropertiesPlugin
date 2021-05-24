@@ -17,6 +17,9 @@ public class JavacPluginIntegrationTest {
             "package org.banana.javacplugin;\n" +
                     "\n" +
                     "public class " + CLASS_NAME + " {\n" +
+                    "    public static int testVarArgs(int firstParam, int... varArgParams) {\n" +
+                    "        return varArgParams.length;\n" +
+                    "    }\n" +
                     "    public static int test(String i) {\n%s\n}" +
                     "    public static void main(String[] args) {\n" +
                     "        System.out.println(\"Hello world!\");\n" +
@@ -76,12 +79,44 @@ public class JavacPluginIntegrationTest {
     }
 
     @Test
+    public void shouldCompileVarargs() {
+        compileAndRun(String.format(CLASS_TEMPLATE, "" +
+                "        i.haha = 67;\n" +
+                "        return testVarArgs(6, i.haha);\n"
+        ));
+    }
+
+    @Test
+    public void shouldCompileNonVarargInMethodThatTakesVarargs() {
+        compileAndRun(String.format(CLASS_TEMPLATE, "" +
+                "        i.haha = 67;\n" +
+                "        return testVarArgs(i.haha);\n"
+        ));
+    }
+
+    @Test
     public void shouldThrowForUnsetProperties() {
         IllegalStateException thrown = assertThrows(
                 IllegalStateException.class, () ->
-                        compileAndRun(String.format(CLASS_TEMPLATE, "" +
-                                "        return i.hihi;"
-                        ))
+                        compileAndRun(String.format(CLASS_TEMPLATE, "        return i.hihi;"))
+        );
+        assertEquals(thrown.getMessage(), "Attempting to read unknown property hihi!");
+    }
+
+    @Test
+    public void shouldThrowForUnsetPropertiesInBlock() {
+        IllegalStateException thrown = assertThrows(
+                IllegalStateException.class, () ->
+                        compileAndRun(String.format(CLASS_TEMPLATE, "        {return i.hihi;}"))
+        );
+        assertEquals(thrown.getMessage(), "Attempting to read unknown property hihi!");
+    }
+
+     @Test
+    public void shouldThrowForUnsetNestedPropertiesInReturn() {
+        IllegalStateException thrown = assertThrows(
+                IllegalStateException.class, () ->
+                        compileAndRun(String.format(CLASS_TEMPLATE, "        return i.hihi.haha;"))
         );
         assertEquals(thrown.getMessage(), "Attempting to read unknown property hihi!");
     }

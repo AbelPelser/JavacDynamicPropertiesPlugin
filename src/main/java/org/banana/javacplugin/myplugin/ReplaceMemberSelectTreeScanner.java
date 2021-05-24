@@ -5,6 +5,7 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
@@ -13,6 +14,7 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -85,6 +87,7 @@ public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
         return null;
     }
 
+
     // We are replacing an expression of a passed parameter, and need to cast appropriately
     private Type findTypeOfPassedParameter(JCTree.JCMethodInvocation parent, JCTree param) {
         int paramIndex = parent.args.indexOf(param);
@@ -95,11 +98,35 @@ public class ReplaceMemberSelectTreeScanner extends AbstractBananaTreeScanner {
                 .map(p -> (JCTree.JCIdent) p)
                 .map(i -> i.sym)
                 .map(s -> (Symbol.MethodSymbol) s)
-                .map(s -> s.type)
-                .map(t -> (Type.MethodType) t)
-                .map(t -> t.argtypes)
-                .map(a -> a.get(paramIndex))
+                .map(s -> findTypeOfPassedParameter(s, paramIndex))
                 .orElse(null);
+    }
+
+    private boolean paramIsVararg(Symbol.MethodSymbol sym, List<Type> argTypes, int paramIndex) {
+        if ((sym.flags_field & Flags.VARARGS) != 0) {
+            return paramIndex >= argTypes.size() - 1;
+        }
+        return false;
+    }
+
+    private Type findTypeOfPassedParameter(Symbol.MethodSymbol sym, int paramIndex) {
+        Type.MethodType methodType = (Type.MethodType) sym.type;
+        if (paramIsVararg(sym, methodType.argtypes, paramIndex)) {
+            return getVarArgsType(methodType.argtypes);
+        } else if (paramIndex < methodType.argtypes.size()) {
+            return methodType.argtypes.get(paramIndex);
+        }
+        p("Could not find type of parameter #" + paramIndex + " in method " + sym);
+        return null;
+    }
+
+    private Type getVarArgsType(List<Type> argTypes) {
+        Type varArgsType = argTypes.last();
+        if (varArgsType instanceof Type.ArrayType) {
+            return ((Type.ArrayType) varArgsType).elemtype;
+        }
+        p("Attempted to find varArgType in parameter list " + argTypes + " but couldn't");
+        return null;
     }
 
     private JCTree.JCExpression createReplacementReadNode(JCTree.JCFieldAccess fieldAccess) {
