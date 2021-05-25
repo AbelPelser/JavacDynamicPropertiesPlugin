@@ -65,8 +65,6 @@ public class JavacTaskListener implements TaskListener {
         if (e.getKind() == TaskEvent.Kind.PARSE) {
             addStaticCode(jcCompilationUnit);
             List<JCTree.JCCompilationUnit> results = javaCompiler.enterTrees(javacList(jcCompilationUnit));
-            log.printRawLines(results.size() + " results!");
-            log.printRawLines(todo.size() + " TODOs!");
             while (!todo.isEmpty()) {
                 attr.attrib(todo.remove());
             }
