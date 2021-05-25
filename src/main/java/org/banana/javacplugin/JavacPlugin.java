@@ -4,7 +4,7 @@ import com.sun.source.util.JavacTask;
 import com.sun.source.util.Plugin;
 import com.sun.tools.javac.api.BasicJavacTask;
 import com.sun.tools.javac.util.Context;
-import org.banana.javacplugin.myplugin.MyJavacTaskListener;
+import org.banana.javacplugin.deepee.JavacTaskListener;
 
 public class JavacPlugin implements Plugin {
 
@@ -19,6 +19,6 @@ public class JavacPlugin implements Plugin {
     public void init(JavacTask task, String... args) {
         BasicJavacTask basicJavacTask = (BasicJavacTask) task;
         Context context = basicJavacTask.getContext();
-        task.addTaskListener(new MyJavacTaskListener(context));
+        task.addTaskListener(new JavacTaskListener(context));
     }
 }

@@ -1,6 +1,5 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
-import com.sun.source.util.TreePathScanner;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -17,7 +16,7 @@ import java.util.*;
 
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class AbstractBananaTreeScanner extends CustomTreePathScanner<Void, Void> {
+public class AbstractCustomTreeScanner extends CustomTreePathScanner<Void, Void> {
     protected static final String JAVA_LANG_REFLECT = "java.lang.reflect";
     protected static final String JAVA_UTIL = "java.util";
 
@@ -37,14 +36,14 @@ public class AbstractBananaTreeScanner extends CustomTreePathScanner<Void, Void>
     protected static final String SET = "set";
     protected static final String SYNC_MAP = "synchronizedMap";
     protected static final int RANDOM_NR = Math.abs(new Random().nextInt());
-    protected static final String MONKEY_MAP = "__monkeyMap" + RANDOM_NR;
-    protected static final String GET_METHOD = "__getMonkeyPatchProperty" + RANDOM_NR;
-    protected static final String SET_METHOD = "__setMonkeyPatchProperty" + RANDOM_NR;
+    protected static final String GLOBAL_PROPERTY_MAP = "__globalPropertyMap" + RANDOM_NR;
+    protected static final String GET_PROPERTY_METHOD = "__getProperty" + RANDOM_NR;
+    protected static final String SET_PROPERTY_METHOD = "__setProperty" + RANDOM_NR;
     protected final TreeMaker factory;
-    protected final Names symbolsTable;
     protected final Log log;
+    private final Names symbolsTable;
 
-    public AbstractBananaTreeScanner(Context context) {
+    public AbstractCustomTreeScanner(Context context) {
         factory = TreeMaker.instance(context);
         symbolsTable = Names.instance(context);
         log = Log.instance(context);
@@ -108,6 +107,7 @@ public class AbstractBananaTreeScanner extends CustomTreePathScanner<Void, Void>
         return createMethodInvocation(mapName, GET, createIdent(value));
     }
 
+    // varName.memberName
     protected JCTree.JCFieldAccess createMemberSelect(JCTree.JCExpression varName, String memberName) {
         return factory.Select(varName, createName(memberName));
     }
@@ -117,6 +117,7 @@ public class AbstractBananaTreeScanner extends CustomTreePathScanner<Void, Void>
         return createMemberSelect(createIdent(varName), memberName);
     }
 
+    // method(...args)
     protected JCTree.JCMethodInvocation createMethodInvocation(JCTree.JCExpression method, JCTree.JCExpression... args) {
         return factory.Apply(null, method, javacList(args));
     }
@@ -131,6 +132,7 @@ public class AbstractBananaTreeScanner extends CustomTreePathScanner<Void, Void>
         return factory.Exec(expression);
     }
 
+    // varType<...paramArgTypeNames>
     protected JCTree.JCTypeApply createParametrizedType(String varType, JCTree.JCExpression... paramArgTypes) {
         return factory.TypeApply(
                 createIdent(varType),
@@ -138,8 +140,7 @@ public class AbstractBananaTreeScanner extends CustomTreePathScanner<Void, Void>
         );
     }
 
-    // varType<paramArgTypeNames>
-    // Example: Map<String, Object>
+    // varType<...paramArgTypeNames>
     protected JCTree.JCTypeApply createParametrizedType(String varTypeName, String... paramArgTypeNames) {
         JCTree.JCIdent[] paramArgs = Arrays.stream(paramArgTypeNames)
                 .map(this::createIdent)

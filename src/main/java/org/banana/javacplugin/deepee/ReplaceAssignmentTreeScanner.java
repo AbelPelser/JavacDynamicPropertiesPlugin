@@ -1,4 +1,4 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.source.tree.AssignmentTree;
 import com.sun.tools.javac.code.Type;
@@ -12,7 +12,7 @@ public class ReplaceAssignmentTreeScanner extends AbstractReplaceTreeScanner {
 
     private JCTree.JCMethodInvocation createSetInvocation(JCTree.JCFieldAccess fieldAccess, JCTree.JCExpression value) {
         return createMethodInvocation(
-                createIdent(SET_METHOD),
+                createIdent(SET_PROPERTY_METHOD),
                 fieldAccess.selected,
                 convertNameToStringParam(fieldAccess.name),
                 value

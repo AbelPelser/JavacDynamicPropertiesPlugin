@@ -21,6 +21,6 @@ public class SimplePrintTreeScanner extends TreeScanner<Void, List<JCTree>> {
     @Override
     public Void visitCompilationUnit(CompilationUnitTree compilationUnitTree, List<JCTree> unused) {
         log.printRawLines(compilationUnitTree.toString());
-        return super.visitCompilationUnit(compilationUnitTree, unused);
+        return null;
     }
 }

@@ -1,15 +1,13 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
-import java.util.Map;
-
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class AddImportsTreeScanner extends AbstractBananaTreeScanner {
+public class AddImportsTreeScanner extends AbstractCustomTreeScanner {
     public AddImportsTreeScanner(Context context) {
         super(context);
     }
@@ -30,6 +28,7 @@ public class AddImportsTreeScanner extends AbstractBananaTreeScanner {
             JCTree.JCCompilationUnit jcCompilationUnit = (JCTree.JCCompilationUnit) compilationUnitTree;
             List<JCTree> defs = jcCompilationUnit.defs;
             List<JCTree> imports = getImports();
+            // Ensure the package statement remains first
             if (defs.isEmpty() || defs.head instanceof JCTree.JCImport || defs.head instanceof JCTree.JCClassDecl) {
                 jcCompilationUnit.defs = defs.prependList(imports);
             } else {

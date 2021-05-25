@@ -1,4 +1,4 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.tools.javac.code.Type;
@@ -12,7 +12,7 @@ public class ReplaceMemberSelectTreeScanner extends AbstractReplaceTreeScanner {
 
     private JCTree.JCMethodInvocation createGetInvocation(JCTree.JCFieldAccess fieldAccess) {
         return createMethodInvocation(
-                createIdent(GET_METHOD),
+                createIdent(GET_PROPERTY_METHOD),
                 fieldAccess.selected,
                 convertNameToStringParam(fieldAccess.name)
         );

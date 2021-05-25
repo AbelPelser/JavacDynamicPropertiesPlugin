@@ -1,4 +1,4 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.TaskEvent;
@@ -18,7 +18,7 @@ import java.util.List;
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
 
-public class MyJavacTaskListener implements TaskListener {
+public class JavacTaskListener implements TaskListener {
     private final Context context;
     private final Log log;
     private final Attr attr;
@@ -30,7 +30,7 @@ public class MyJavacTaskListener implements TaskListener {
     private final ReplaceMemberSelectTreeScanner replaceMemberSelectTreeScanner;
     private final SimplePrintTreeScanner simplePrintTreeScanner;
 
-    public MyJavacTaskListener(Context context) {
+    public JavacTaskListener(Context context) {
         this.context = context;
         log = Log.instance(context);
         attr = Attr.instance(context);
@@ -51,9 +51,9 @@ public class MyJavacTaskListener implements TaskListener {
         log.printRawLines("STARTED " + e.getKind());
     }
 
-    private void addMonkeyPatchCode(JCTree.JCCompilationUnit jcCompilationUnit) {
-        runTree(jcCompilationUnit, new AddMonkeyGetTreeScanner(context));
-        runTree(jcCompilationUnit, new AddMonkeySetTreeScanner(context));
+    private void addStaticCode(JCTree.JCCompilationUnit jcCompilationUnit) {
+        runTree(jcCompilationUnit, new AddGetPropertyMethodTreeScanner(context));
+        runTree(jcCompilationUnit, new AddSetPropertyMethodTreeScanner(context));
         runTree(jcCompilationUnit, new AddEnvironmentSetupTreeScanner(context));
         runTree(jcCompilationUnit, new AddImportsTreeScanner(context));
     }
@@ -63,7 +63,7 @@ public class MyJavacTaskListener implements TaskListener {
         JCTree.JCCompilationUnit jcCompilationUnit = (JCTree.JCCompilationUnit) e.getCompilationUnit();
         log.printRawLines("FINISHED " + e.getKind());
         if (e.getKind() == TaskEvent.Kind.PARSE) {
-            addMonkeyPatchCode(jcCompilationUnit);
+            addStaticCode(jcCompilationUnit);
             List<JCTree.JCCompilationUnit> results = javaCompiler.enterTrees(javacList(jcCompilationUnit));
             log.printRawLines(results.size() + " results!");
             log.printRawLines(todo.size() + " TODOs!");
@@ -75,7 +75,7 @@ public class MyJavacTaskListener implements TaskListener {
                     .orElseThrow(() -> new IllegalStateException("No results obtained from enterTrees"));
             runTree(result, replaceAssignmentTreeScanner);
             runTree(result, replaceMemberSelectTreeScanner);
-//            runTree(result, simplePrintTreeScanner);
+            runTree(result, simplePrintTreeScanner);
             chk.compiled.clear();
         }
     }

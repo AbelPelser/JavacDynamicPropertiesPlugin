@@ -1,17 +1,17 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 
-public abstract class AbstractAddMonkeyGetSetTreeScanner extends AbstractBananaTreeScanner {
+public abstract class AbstractAddMethodTreeScanner extends AbstractCustomTreeScanner {
     protected static final String CONTAINS_KEY = "containsKey";
     protected static final String OBJECT_ID = "id";
     protected static final String OBJECT_PARAM = "object";
-    protected static final String PROP_MAP = "propMap";
-    protected static final String PROP_NAME_PARAM = "propName";
+    protected static final String OBJECT_PROPERTY_MAP = "propMap";
+    protected static final String PROPERTY_NAME_PARAM = "propName";
 
-    public AbstractAddMonkeyGetSetTreeScanner(Context context) {
+    public AbstractAddMethodTreeScanner(Context context) {
         super(context);
     }
 
@@ -29,30 +29,30 @@ public abstract class AbstractAddMonkeyGetSetTreeScanner extends AbstractBananaT
                 .build();
     }
 
-    // monkeyMap.containsKey(id)
+    // globalPropertyMap.containsKey(id)
     protected JCTree.JCExpression ifMapContainsObjectId() {
-        return createMethodInvocation(MONKEY_MAP, CONTAINS_KEY, createIdent(OBJECT_ID));
+        return createMethodInvocation(GLOBAL_PROPERTY_MAP, CONTAINS_KEY, createIdent(OBJECT_ID));
     }
 
-    // monkeyMap.get(id)
-    protected JCTree.JCMethodInvocation getPropMap() {
-        return createMapGet(MONKEY_MAP, OBJECT_ID);
+    // globalPropertyMap.get(id)
+    protected JCTree.JCMethodInvocation getObjectPropertyMap() {
+        return createMapGet(GLOBAL_PROPERTY_MAP, OBJECT_ID);
     }
 
-    // (Map<String, Object>)monkeyMap.get(id)
-    protected JCTree.JCExpression getAndCastPropMap() {
+    // (Map<String, Object>)globalPropertyMap.get(id)
+    protected JCTree.JCExpression getAndCastObjectPropertyMap() {
         return factory.TypeCast(
                 createParametrizedType(MAP, STRING, OBJECT),
-                getPropMap()
+                getObjectPropertyMap()
         );
     }
 
-    // Map<String, Object> propMap = (Map<String, Object>)monkeyMap.get(id);
-    protected JCTree.JCVariableDecl getAndStoreObjectPropMap() {
+    // Map<String, Object> propMap = (Map<String, Object>)globalPropertyMap.get(id);
+    protected JCTree.JCVariableDecl getAndStoreObjectPropertyMap() {
         return getVarDefBuilder()
-                .name(PROP_MAP)
+                .name(OBJECT_PROPERTY_MAP)
                 .type(MAP, STRING, OBJECT)
-                .init(getAndCastPropMap())
+                .init(getAndCastObjectPropertyMap())
                 .build();
     }
 }

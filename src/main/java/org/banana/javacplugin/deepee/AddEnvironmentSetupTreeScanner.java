@@ -1,4 +1,4 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.tools.javac.code.Flags;
@@ -10,7 +10,7 @@ import com.sun.tools.javac.util.List;
 import static com.sun.tools.javac.code.BoundKind.UNBOUND;
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
+public class AddEnvironmentSetupTreeScanner extends AbstractCustomTreeScanner {
     private static final String GET_DECLARED_FIELD = "getDeclaredField";
     private static final String MODIFIERS_FIELD = "modifiersField";
     private static final String OLD_ENV_MAP = "oldMap";
@@ -124,19 +124,19 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
         return createMethodInvocation(COLLECTIONS, SYNC_MAP, copyOldEnvMap());
     }
 
-    // monkeyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
+    // globalPropertyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
     private JCTree.JCExpressionStatement cloneAndStoreEnvMap() {
-        return exprToStmt(factory.Assign(createIdent(MONKEY_MAP), copyAndSyncOldEnvMap()));
+        return exprToStmt(factory.Assign(createIdent(GLOBAL_PROPERTY_MAP), copyAndSyncOldEnvMap()));
     }
 
-    // unmodifiableMapField.set(null, monkeyMap);
+    // unmodifiableMapField.set(null, globalPropertyMap);
     private JCTree.JCExpressionStatement cloneAndReplaceEnvMap() {
         return exprToStmt(
                 createMethodInvocation(
                         UNMODIFIABLE_MAP_FIELD,
                         SET,
                         factory.Literal(TypeTag.BOT, null),
-                        createIdent(MONKEY_MAP)
+                        createIdent(GLOBAL_PROPERTY_MAP)
                 )
         );
     }
@@ -148,8 +148,8 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
      *  Field modifiersField = Field.class.getDeclaredField("modifiers");
      *  modifiersField.setAccessible(true);
      *  modifiersField.setInt(unmodifiableMapField, unmodifiableMapField.getModifiers() & ~Modifier.FINAL);
-     *  monkeyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
-     *  unmodifiableMapField.set(null, monkeyMap);
+     *  globalPropertyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
+     *  unmodifiableMapField.set(null, globalPropertyMap);
      */
     private List<JCTree.JCStatement> createSetupTryBlockStmts() {
         return javacList(
@@ -196,8 +196,8 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
      *      Field modifiersField = Field.class.getDeclaredField("modifiers");
      *      modifiersField.setAccessible(true);
      *      modifiersField.setInt(unmodifiableMapField, unmodifiableMapField.getModifiers() & ~Modifier.FINAL);
-     *      monkeyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
-     *      unmodifiableMapField.set(null, monkeyMap);
+     *      globalPropertyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
+     *      unmodifiableMapField.set(null, globalPropertyMap);
      *  } catch (Exception ignore) {
      *  }
      */
@@ -224,8 +224,8 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
      *          Field modifiersField = Field.class.getDeclaredField("modifiers");
      *          modifiersField.setAccessible(true);
      *          modifiersField.setInt(unmodifiableMapField, unmodifiableMapField.getModifiers() & ~Modifier.FINAL);
-     *          monkeyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
-     *          unmodifiableMapField.set(null, monkeyMap);
+     *          globalPropertyMap = Collections.synchronizedMap(new HashMap<Object, Object>(oldMap));
+     *          unmodifiableMapField.set(null, globalPropertyMap);
      *      } catch (Exception ignore) {
      *      }
      * }
@@ -250,11 +250,11 @@ public class AddEnvironmentSetupTreeScanner extends AbstractBananaTreeScanner {
                 .build();
     }
 
-    // private static Map<Object, Object> monkeyMap;
+    // private static Map<Object, Object> globalPropertyMap;
     private JCTree.JCVariableDecl createEnvMapVar() {
         return getVarDefBuilder()
                 .modifiers(Flags.PRIVATE | Flags.STATIC)
-                .name(MONKEY_MAP)
+                .name(GLOBAL_PROPERTY_MAP)
                 .type(MAP, OBJECT, OBJECT)
                 .build();
     }

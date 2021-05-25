@@ -1,4 +1,4 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.tools.javac.code.Flags;
@@ -8,19 +8,19 @@ import com.sun.tools.javac.util.List;
 
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner {
-    public AddMonkeyGetTreeScanner(Context context) {
+public class AddGetPropertyMethodTreeScanner extends AbstractAddMethodTreeScanner {
+    public AddGetPropertyMethodTreeScanner(Context context) {
         super(context);
     }
 
     // propMap.containsKey(propName)
     private JCTree.JCExpression ifPropMapContainsPropName() {
-        return createMethodInvocation(PROP_MAP, CONTAINS_KEY, createIdent(PROP_NAME_PARAM));
+        return createMethodInvocation(OBJECT_PROPERTY_MAP, CONTAINS_KEY, createIdent(PROPERTY_NAME_PARAM));
     }
 
     // return propMap.get(propName);
     private JCTree.JCReturn returnValueFromPropMap() {
-        return factory.Return(createMapGet(PROP_MAP, PROP_NAME_PARAM));
+        return factory.Return(createMapGet(OBJECT_PROPERTY_MAP, PROPERTY_NAME_PARAM));
     }
 
     /* if (propMap.containsKey(propName)) {
@@ -34,14 +34,14 @@ public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
                 .build();
     }
 
-    /* Map<String, Object> propMap = (Map<String, Object>)monkeyMap.get(id);
+    /* Map<String, Object> propMap = (Map<String, Object>)globalPropertyMap.get(id);
      * if (propMap.containsKey(propName)) {
      *     return propMap.get(propName);
      * }
      */
-    private JCTree.JCBlock getPropMapAndReturnValueIfPresent() {
+    private JCTree.JCBlock getObjectPropertyMapAndReturnValueIfPresent() {
         List<JCTree.JCStatement> statements = javacList(
-                getAndStoreObjectPropMap(),
+                getAndStoreObjectPropertyMap(),
                 ifPropNameIsKnown()
         );
         return getBlockBuilder()
@@ -49,17 +49,17 @@ public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
                 .build();
     }
 
-    /* if (monkeyMap.containsKey(id)) {
-     *     Map<String, Object> propMap = (Map<String, Object>)monkeyMap.get(id);
+    /* if (globalPropertyMap.containsKey(id)) {
+     *     Map<String, Object> propMap = (Map<String, Object>)globalPropertyMap.get(id);
      *     if (propMap.containsKey(propName)) {
      *         return propMap.get(propName);
      *     }
      * }
      */
-    private JCTree.JCIf ifObjectInMonkeyMap() {
+    private JCTree.JCIf ifObjectInGlobalPropertyMap() {
         return getIfBuilder()
                 .condition(ifMapContainsObjectId())
-                .ifBlock(getPropMapAndReturnValueIfPresent())
+                .ifBlock(getObjectPropertyMapAndReturnValueIfPresent())
                 .build();
     }
 
@@ -70,7 +70,7 @@ public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
                 factory.Literal("Attempting to read unknown property "),
                 factory.Binary(
                         JCTree.Tag.PLUS,
-                        createIdent(PROP_NAME_PARAM),
+                        createIdent(PROPERTY_NAME_PARAM),
                         factory.Literal("!")
                 )
         );
@@ -89,7 +89,7 @@ public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
     private JCTree.JCBlock createGetMethodBlock() {
         List<JCTree.JCStatement> statements = javacList(
                 getAndStoreObjectId(),
-                ifObjectInMonkeyMap(),
+                ifObjectInGlobalPropertyMap(),
                 throwPropertyUnknownException()
         );
         return getBlockBuilder()
@@ -101,14 +101,14 @@ public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
     private List<JCTree.JCVariableDecl> createGetMethodParams() {
         return javacList(
                 createParameter(OBJECT, OBJECT_PARAM),
-                createParameter(STRING, PROP_NAME_PARAM)
+                createParameter(STRING, PROPERTY_NAME_PARAM)
         );
     }
 
-    /*  private static Object getMonkeyPatchProperty(Object object, String propName) {
+    /*  private static Object getProperty(Object object, String propName) {
      *      int id = object.hashCode();
-     *      if (monkeyMap.containsKey(id)) {
-     *          Map<String, Object> propMap = (Map<String, Object>)monkeyMap.get(id);
+     *      if (globalPropertyMap.containsKey(id)) {
+     *          Map<String, Object> propMap = (Map<String, Object>)globalPropertyMap.get(id);
      *          if (propMap.containsKey(propName)) {
      *              return propMap.get(propName);
      *          }
@@ -119,7 +119,7 @@ public class AddMonkeyGetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
     private JCTree.JCMethodDecl createGetMethod() {
         return getMethodDefBuilder()
                 .modifiers(Flags.PRIVATE | Flags.STATIC)
-                .name(GET_METHOD)
+                .name(GET_PROPERTY_METHOD)
                 .returnType(createIdent(OBJECT))
                 .params(createGetMethodParams())
                 .block(createGetMethodBlock())

@@ -1,4 +1,4 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.TypeCastTree;
@@ -18,7 +18,8 @@ import java.util.Optional;
 
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class AbstractReplaceTreeScanner extends AbstractBananaTreeScanner {
+public class AbstractReplaceTreeScanner extends AbstractCustomTreeScanner {
+
     public AbstractReplaceTreeScanner(Context context) {
         super(context);
     }

@@ -1,4 +1,4 @@
-package org.banana.javacplugin.myplugin;
+package org.banana.javacplugin.deepee;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.tools.javac.code.Flags;
@@ -8,39 +8,39 @@ import com.sun.tools.javac.util.List;
 
 import static org.banana.javacplugin.util.ListUtil.javacList;
 
-public class AddMonkeySetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner {
+public class AddSetPropertyMethodTreeScanner extends AbstractAddMethodTreeScanner {
     private static final String VALUE_PARAM = "value";
 
-    public AddMonkeySetTreeScanner(Context context) {
+    public AddSetPropertyMethodTreeScanner(Context context) {
         super(context);
     }
 
     // new HashMap<String, Object>()
-    private JCTree.JCNewClass createPropMap() {
+    private JCTree.JCNewClass createObjectPropertyMap() {
         return getNewClassBuilder()
                 .clazz(createParametrizedType(HASH_MAP, STRING, OBJECT))
                 .build();
     }
 
-    // monkeyMap.put(id, new HashMap<String, Object>());
-    private JCTree.JCExpressionStatement createAndStorePropMap() {
-        return exprToStmt(createMethodInvocation(MONKEY_MAP, PUT, createIdent(OBJECT_ID), createPropMap()));
+    // globalPropertyMap.put(id, new HashMap<String, Object>());
+    private JCTree.JCExpressionStatement createAndStoreObjectPropertyMap() {
+        return exprToStmt(createMethodInvocation(GLOBAL_PROPERTY_MAP, PUT, createIdent(OBJECT_ID), createObjectPropertyMap()));
     }
 
-    /* if (!monkeyMap.containsKey(id)) {
-     *     monkeyMap.put(id, new HashMap<String, Object>());
+    /* if (!globalPropertyMap.containsKey(id)) {
+     *     globalPropertyMap.put(id, new HashMap<String, Object>());
      * }
      */
-    private JCTree.JCIf ifObjectNotInMonkeyMap() {
+    private JCTree.JCIf ifObjectNotInGlobalPropertyMap() {
         return getIfBuilder()
                 .condition(factory.Unary(JCTree.Tag.NOT, ifMapContainsObjectId()))
-                .ifBlock(createAndStorePropMap())
+                .ifBlock(createAndStoreObjectPropertyMap())
                 .build();
     }
 
     // propMap.put(propName, value);
-    private JCTree.JCExpressionStatement storeValueInPropMap() {
-        return exprToStmt(createMethodInvocation(PROP_MAP, PUT, createIdent(PROP_NAME_PARAM), createIdent(VALUE_PARAM)));
+    private JCTree.JCExpressionStatement storeValueInObjectPropertyMap() {
+        return exprToStmt(createMethodInvocation(OBJECT_PROPERTY_MAP, PUT, createIdent(PROPERTY_NAME_PARAM), createIdent(VALUE_PARAM)));
     }
 
     // return value;
@@ -50,10 +50,10 @@ public class AddMonkeySetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
 
     /* {
      *     int id = object.hashCode();
-     *     if (!monkeyMap.containsKey(id)) {
-     *         monkeyMap.put(id, new HashMap<String, Object>());
+     *     if (!globalPropertyMap.containsKey(id)) {
+     *         globalPropertyMap.put(id, new HashMap<String, Object>());
      *     }
-     *     Map<String, Object> propMap = (Map<String, Object>)monkeyMap.get(id);
+     *     Map<String, Object> propMap = (Map<String, Object>)globalPropertyMap.get(id);
      *     propMap.put(propName, value);
      *     return value;
      * }
@@ -61,9 +61,9 @@ public class AddMonkeySetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
     private JCTree.JCBlock createSetMethodBlock() {
         List<JCTree.JCStatement> statements = javacList(
                 getAndStoreObjectId(),
-                ifObjectNotInMonkeyMap(),
-                getAndStoreObjectPropMap(),
-                storeValueInPropMap(),
+                ifObjectNotInGlobalPropertyMap(),
+                getAndStoreObjectPropertyMap(),
+                storeValueInObjectPropertyMap(),
                 returnValue()
         );
         return getBlockBuilder()
@@ -75,17 +75,17 @@ public class AddMonkeySetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
     private List<JCTree.JCVariableDecl> createSetMethodParams() {
         return javacList(
                 createParameter(OBJECT, OBJECT_PARAM),
-                createParameter(STRING, PROP_NAME_PARAM),
+                createParameter(STRING, PROPERTY_NAME_PARAM),
                 createParameter(OBJECT, VALUE_PARAM)
         );
     }
 
-    /* private static Object setMonkeyPatchProperty(Object object, String propName, Object value) {
+    /* private static Object setProperty(Object object, String propName, Object value) {
      *     int id = object.hashCode();
-     *     if (!monkeyMap.containsKey(id)) {
-     *         monkeyMap.put(id, new HashMap<String, Object>());
+     *     if (!globalPropertyMap.containsKey(id)) {
+     *         globalPropertyMap.put(id, new HashMap<String, Object>());
      *     }
-     *     Map<String, Object> propMap = (Map<String, Object>)monkeyMap.get(id);
+     *     Map<String, Object> propMap = (Map<String, Object>)globalPropertyMap.get(id);
      *     propMap.put(propName, value);
      *     return value;
      * }
@@ -94,7 +94,7 @@ public class AddMonkeySetTreeScanner extends AbstractAddMonkeyGetSetTreeScanner 
         return getMethodDefBuilder()
                 .modifiers(Flags.PRIVATE | Flags.STATIC)
                 .returnType(createIdent(OBJECT))
-                .name(SET_METHOD)
+                .name(SET_PROPERTY_METHOD)
                 .params(createSetMethodParams())
                 .block(createSetMethodBlock())
                 .build();

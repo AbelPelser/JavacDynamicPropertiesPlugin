@@ -27,6 +27,4 @@ public class BlockBuilder extends AbstractTreeBuilder<JCTree.JCBlock> {
     public JCTree.JCBlock build() {
         return factory.Block(flags, statements);
     }
-
-    private static Map map;
 }
