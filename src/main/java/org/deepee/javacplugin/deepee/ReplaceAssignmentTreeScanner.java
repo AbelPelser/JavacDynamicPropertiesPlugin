@@ -19,10 +19,18 @@ public class ReplaceAssignmentTreeScanner extends AbstractReplaceTreeScanner {
         );
     }
 
+    private Type getCastTypeForAssign(JCTree.JCAssign jcAssign) {
+        Type rhsType = jcAssign.rhs.type;
+        if (rhsType == null || rhsType instanceof Type.ErrorType) {
+            return getCastTypeFromOuterContext(jcAssign);
+        }
+        return rhsType;
+    }
+
     private JCTree.JCExpression createReplacementWriteNode(JCTree.JCAssign assign) {
         JCTree.JCFieldAccess fieldAccess = (JCTree.JCFieldAccess) assign.lhs;
         JCTree.JCExpression setInvocation = createSetInvocation(fieldAccess, assign.rhs);
-        return createCastIfPossible(setInvocation, getCastTypeForNode(assign));
+        return createCastIfPossible(setInvocation, getCastTypeForAssign(assign));
     }
 
     @Override

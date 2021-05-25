@@ -19,7 +19,7 @@ public class ReplaceMemberSelectTreeScanner extends AbstractReplaceTreeScanner {
     }
 
     private JCTree.JCExpression createReplacementReadNode(JCTree.JCFieldAccess fieldAccess) {
-        return createCastIfPossible(createGetInvocation(fieldAccess), getCastTypeForNode(fieldAccess));
+        return createCastIfPossible(createGetInvocation(fieldAccess), getCastTypeFromOuterContext(fieldAccess));
     }
 
     @Override

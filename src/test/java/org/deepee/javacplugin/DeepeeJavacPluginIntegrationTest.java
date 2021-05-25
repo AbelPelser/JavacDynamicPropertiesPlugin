@@ -152,6 +152,15 @@ public class DeepeeJavacPluginIntegrationTest {
     }
 
     @Test
+    public void shouldRunPassingAssignParam() {
+        compileAndRunSuccessfully(String.format(TEST_METHOD_TEMPLATE, "" +
+                "        if (i.equals(\"fifi\")) return 0;\n" +
+                "        i.haha = \"fifi\";\n" +
+                "        return test(i.hihi = i.haha);\n"
+        ), 0);
+    }
+
+    @Test
     public void shouldRunNestedProperties() {
         compileAndRunSuccessfully(String.format(TEST_METHOD_TEMPLATE, "" +
                 "        i.hihi = 7;\n" +

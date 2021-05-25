@@ -52,19 +52,14 @@ public class AbstractReplaceTreeScanner extends AbstractCustomTreeScanner {
         return methodDecl.restype.type;
     }
 
-    protected Type getCastTypeForNode(JCTree tree) {
-        if (tree instanceof JCTree.JCFieldAccess) {
-            JCTree parent = getParentNode();
-            if (parent instanceof JCTree.JCReturn) {
-                return findReturnTypeOfEnclosingMethod(getParentPath());
-            } else if (parent instanceof JCTree.JCMethodInvocation) {
-                return findTypeOfPassedParameter((JCTree.JCMethodInvocation) parent, tree);
-            }
-            return parent.type;
-        } else if (tree instanceof JCTree.JCAssign) {
-            return ((JCTree.JCAssign) tree).rhs.type;
+    protected Type getCastTypeFromOuterContext(JCTree tree) {
+        JCTree parent = getParentNode();
+        if (parent instanceof JCTree.JCReturn) {
+            return findReturnTypeOfEnclosingMethod(getParentPath());
+        } else if (parent instanceof JCTree.JCMethodInvocation) {
+            return findTypeOfPassedParameter((JCTree.JCMethodInvocation) parent, tree);
         }
-        return null;
+        return parent.type;
     }
 
     // We are replacing an expression of a passed parameter, and need to cast appropriately
