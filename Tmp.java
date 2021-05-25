@@ -1,4 +1,4 @@
-package org.banana.javacplugin;
+package org.deepee.javacplugin;
 
 public class Tmp {
     /*private static int test(String i) {
