@@ -18,7 +18,7 @@ import java.util.List;
 import static org.deepee.javacplugin.util.ListUtil.javacList;
 
 
-public class JavacTaskListener implements TaskListener {
+public class DeepeeTaskListener implements TaskListener {
     private final Context context;
     private final Log log;
     private final Attr attr;
@@ -30,7 +30,7 @@ public class JavacTaskListener implements TaskListener {
     private final ReplaceMemberSelectTreeScanner replaceMemberSelectTreeScanner;
     private final SimplePrintTreeScanner simplePrintTreeScanner;
 
-    public JavacTaskListener(Context context) {
+    public DeepeeTaskListener(Context context) {
         this.context = context;
         log = Log.instance(context);
         attr = Attr.instance(context);

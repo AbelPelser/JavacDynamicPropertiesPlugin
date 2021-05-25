@@ -1,10 +1,9 @@
 package org.deepee.javacplugin;
 
 public class Tmp {
-    /*private static int test(String i) {
-        i.haha = 7;
-        i.hihi = i.haha;
-        int x = i.hihi;
+    private static int test(String i) {
+        i.haha = 6;
+        int x = i.haha;
         return x;
 //        i.x = 6;
 //        i.doSomething();
@@ -12,17 +11,10 @@ public class Tmp {
 //        boolean b = Optional.of(i)
 //                .map(Tmp::testRef)
 //                .orElse(true);
-    }*/
+    }
 
 
     public static void main(String[] args) {
-//        System.out.println("Hello world! " + test("sss"));
-        X x = new X();
-//        x.y = 7;
-        System.out.println(x);
+        System.out.println("Hello world! " + test("sss"));
     }
-}
-
-class X {
-    private int y = 0;
 }
