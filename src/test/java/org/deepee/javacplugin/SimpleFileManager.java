@@ -9,9 +9,6 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
-/**
- * Adapts {@link SimpleClassFile} to the {@link JavaCompiler}
- */
 public class SimpleFileManager extends ForwardingJavaFileManager<StandardJavaFileManager> {
 
     private final List<SimpleClassFile> compiled = new ArrayList<>();
@@ -30,9 +27,6 @@ public class SimpleFileManager extends ForwardingJavaFileManager<StandardJavaFil
         return result;
     }
 
-    /**
-     * @return compiled binaries processed by the current class
-     */
     public List<SimpleClassFile> getCompiled() {
         return compiled;
     }

@@ -36,7 +36,14 @@ public class AbstractReplaceTreeScanner extends AbstractCustomTreeScanner {
         return factory.Literal(name.toString());
     }
 
+    private JCTree.JCStatement createThrowCasts(JCTree.JCExpression expr) {
+        return null;
+    }
+
     protected JCTree.JCExpression createCastIfPossible(JCTree.JCExpression expr, Type type) {
+//        if (getParentNode() instanceof JCTree.JCThrow) {
+//            return createThrowCasts(expr);
+//        }
         if (type == null || type instanceof Type.ErrorType) {
             p("Not casting, could not determine required type!");
             return expr;
@@ -51,6 +58,8 @@ public class AbstractReplaceTreeScanner extends AbstractCustomTreeScanner {
         JCTree.JCMethodDecl methodDecl = (JCTree.JCMethodDecl) treePath.getLeaf();
         return methodDecl.restype.type;
     }
+
+
 
     protected Type getCastTypeFromOuterContext(JCTree tree) {
         JCTree parent = getParentNode();

@@ -6,9 +6,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import javax.tools.SimpleJavaFileObject;
 
-/**
- * Holds compiled byte code in a byte array
- */
 public class SimpleClassFile extends SimpleJavaFileObject {
 
     private ByteArrayOutputStream out;

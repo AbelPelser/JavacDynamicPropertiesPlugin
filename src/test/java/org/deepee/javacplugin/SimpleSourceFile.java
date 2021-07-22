@@ -3,9 +3,6 @@ package org.deepee.javacplugin;
 import java.net.URI;
 import javax.tools.SimpleJavaFileObject;
 
-/**
- * Exposes given test source to the compiler.
- */
 public class SimpleSourceFile extends SimpleJavaFileObject {
 
     private final String content;

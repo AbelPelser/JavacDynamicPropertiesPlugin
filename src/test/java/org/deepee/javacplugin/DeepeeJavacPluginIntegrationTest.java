@@ -17,7 +17,7 @@ public class DeepeeJavacPluginIntegrationTest {
             "package " + PACKAGE_NAME + ";\n" +
             "\n" +
             "public class " + CLASS_NAME + " {\n" +
-            "%s" +
+            "%s\n" +
             "    public static void main(String[] args) {\n" +
             "        System.out.println(\"Hello world!\");\n" +
             "    }\n" +

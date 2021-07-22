@@ -36,12 +36,12 @@ public class ReplaceAssignmentTreeScanner extends AbstractReplaceTreeScanner {
     @Override
     // Replace member select WRITEs
     public Void visitAssignment(AssignmentTree assignmentTree, Void unused) {
-        JCTree.JCAssign assign = (JCTree.JCAssign) assignmentTree;
-        if (assign.lhs instanceof JCTree.JCFieldAccess && assign.type instanceof Type.ErrorType) {
-            p("\nFound error in visitAssignment: " + assign + " (parent " + getParentNode() + ")");
-            JCTree.JCExpression replacementNode = createReplacementWriteNode(assign);
+        JCTree.JCAssign jcAssign = (JCTree.JCAssign) assignmentTree;
+        if (jcAssign.lhs instanceof JCTree.JCFieldAccess && jcAssign.type instanceof Type.ErrorType) {
+            p("\nFound error in visitAssignment: " + jcAssign + " (parent " + getParentNode() + ")");
+            JCTree.JCExpression replacementNode = createReplacementWriteNode(jcAssign);
             p("Replacement node = " + replacementNode);
-            replacementCurrentNodeInParent(assign, replacementNode);
+            replacementCurrentNodeInParent(jcAssign, replacementNode);
             log.nerrors--;
             return visitReplacementNode(replacementNode, unused);
         }
